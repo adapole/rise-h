@@ -1,18 +1,182 @@
-# Semaphore Hardhat + Next.js + SemaphoreEthers template
+# Rise — Decentralized Interbank Settlement Layer
 
-This project is a complete application that demonstrates a basic Semaphore use case. It comes with a sample contract, a test for that contract and a sample task that deploys that contract. It also contains a frontend to play around with the contract.
+**Track**: Onchain Finance & RWA
 
-## Install
+> ⚡ **“Rise redefines interbank finance by removing central banks as trusted intermediaries — just as Bitcoin cut out financial middlemen for individuals.”**
+>
+> Instead of costly RTGS hubs and idle reserves, Rise enables **peer-to-peer interbank settlements** and **liquidity sharing**, powered by **Hedera DLT**, **Proof-of-SQL**, and **Zero-Knowledge verification**.
 
-### Install dependencies
+## 🧭 Overview
+
+Modern interbank systems rely on centralized RTGS hubs (like Fedwire, TARGET2, or CBE’s ACH) that cause delays, high fees, and forced capital lockups.
+**Rise** replaces this outdated hub-and-spoke model with a **direct**, **decentralized clearing and settlement network**.
+
+- Direct Settlements: Banks settle with each other directly over Hedera, with—no central authority.
+
+- Liquidity Optimization: Idle reserves turn into yield assets. Deferred checks are verified with Proof-of-SQL instead of manual audits.
+
+- Hybrid Efficiency: Large payments mint tokenized equivalents instantly; small transactions are netted for batch efficiency.
+
+- Privacy-Preserving Netting: Uses ZK-proofs and Semaphore anonymity to ensure confidentiality while maintaining full auditability.
+
+When a member bank connects its database, it can prove via PoSQL that a certain amount of reserves were off-ramped, and request an equivalent on-chain mint.
+Each minting action is:
+
+1. Verified on-chain against the PoSQL proof,
+
+2. Priced using the consortium-voted peg, and
+
+3. Executed only after a **timelock delay**.
+
+## Architecture
+
+┌─────────────────────────────────────────────────────────────┐
+│ Off-Chain Layer │
+│ ┌─────────────┐ ┌────────────┐ ┌────────────────┐ │
+│ │ Bank DB │ --> │ Space&Time │ --> │ PoSQL Proof │ │
+│ └─────────────┘ └────────────┘ └────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────────┐
+│ On-Chain Layer │
+│ ┌────────────┐ ┌──────────────────┐ ┌────────────┐ │
+│ │ Semaphore │ -> │ MintController │ -> │ HTS Token │ │
+│ │ (AnonVote) │ │ (Timelocked) │ │ Mint/Burn │ │
+│ └────────────┘ └──────────────────┘ └────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+
+## 🧩 Hedera Integration Summary (Detailed)
+
+### 🪙 Hedera Token Service (HTS) — DynamicPegToken
+
+We use HTS to mint **DynamicPegToken**, the consortium’s stable settlement token.
+Each token represents verified reserve value from connected banks.
+
+- **Why HTS**: Predictable sub-cent mint/burn fees (<$0.001) make it viable for high-volume interbank operations. And with **HTS** speed can reach upto **10,000TPS** compared to alternative _EMV only_ transfer
+
+- **Transaction Types:**
+    - `TokenCreateTransaction` → initialize the consortium stablecoin
+    - `TokenMintTransaction` → mint after verified PoSQL proofs
+
+    - `TokenBurnTransaction` → redeem tokens for fiat withdrawal
+
+- **Economic Justification**: Predictable costs allow stable liquidity management even for small regional banks. Fees remain flat across scale, ensuring operational viability for Africa’s low-margin financial sector.
+
+### ⚙️ Hedera Smart Contract Service (HSCS) — MintController.sol & SemaphoreCicada.sol
+
+We deploy our hybrid **MintController** contract using HSCS, integrating PoSQL verification, timelocks, and HTS minting calls.
+
+- **Why HSCS**: Solidity + Hedera’s ABFT finality provides sub-5s mint confirmations with deterministic gas.
+
+- **Transaction Types:**
+    - `ContractCreateTransaction` for deploying mint controllers
+
+    - `ContractExecuteTransaction` for proof verification & minting
+
+- **Economic Justification:**
+  Finality under 5s + negligible execution fees (<$0.05) supports real-time interbank proofs without needing expensive validator networks. Hedera’s deterministic pricing simplifies compliance planning for African regulators.
+
+### 🕊️ Hedera Consensus Service (HCS) — Audit Logging & Proof Anchoring
+
+All minting proofs and peg votes are immutably logged to an HCS topic.
+
+- **Why HCS**: Provides transparent auditability without revealing private data.
+
+- **Transaction Types:**
+    - `TopicCreateTransaction`
+
+    - `TopicMessageSubmitTransaction` (PoSQL proof hashes, vote hashes)
+
+- **Economic Justification:**
+  Predictable $0.0001/message fees allow continuous proof anchoring with near-zero cost. Immutable logging aids compliance with financial reporting standards in African jurisdictions.
+
+## ⚙️ Architecture Diagram
+
+                 ┌──────────────────────────────┐
+                 │        Bank Database         │
+                 │ (Reserves, Transactions)     │
+                 └─────────────┬────────────────┘
+                               │
+                      Proof-of-SQL Query
+                               │
+                 ┌─────────────▼──────────────┐
+                 │  Space & Time (PoSQL)      │
+                 │ Generates verifiable proof │
+                 └─────────────┬──────────────┘
+                               │
+                      Proof + Query Result
+                               │
+                 ┌─────────────▼──────────────┐
+                 │   MintController (HSCS)    │
+                 │ Verifies proof, checks peg │
+                 │ Enforces timelock          │
+                 └─────────────┬──────────────┘
+                               │
+                     HTS Mint / Burn Call
+                               │
+                 ┌─────────────▼──────────────┐
+                 │   DynamicPegToken (HTS)    │
+                 │  Consortium stablecoin     │
+                 └─────────────┬──────────────┘
+                               │
+                        Audit Hash → HCS
+
+### Core Components
+
+1. **DynamicPegToken**
+
+A Hedera-minted stablecoin whose peg (e.g. USD, EUR) is determined by consortium voting.
+
+- Peg set through fully anonymous voting with timeLock puzzle and homomorphic encryption
+
+- Peg updates delayed by a **timelock**
+
+- Minting gated by valid **PoSQL proof verification**
+
+2. **MintController**
+
+Hybrid smart contract deployed via the **Hedera Smart Contract Service**, integrating:
+
+| Module              | Purpose                                                   |
+| ------------------- | --------------------------------------------------------- |
+| **PoSQLVerifier**   | Validates off-chain SQL proofs from Space & Time          |
+| **Timelock Logic**  | Prevents peg + mint manipulation within same window       |
+| **HTS Precompiles** | Calls `mintToken()` directly through Hedera Token Service |
+| **Proof Registry**  | Prevents reusing or replaying proofs                      |
+
+3. **SemaphoreCicada (v4)**
+
+Anonymous voting and eligibility management based on Semaphore v4 primitives (`verifyProof`, `validateProof`).
+
+4. **PoSQL Timestamp Alignment**
+
+All proofs use **nanosecond-precision timestamps** to align with **Hedera’s ledger time model**.
+
+## 📡 Deployed Hedera Testnet IDs
+
+| Component        | Type           | Hedera ID    | Description                        |
+| ---------------- | -------------- | ------------ | ---------------------------------- |
+| MintController   | Smart Contract | `0.0.985432` | Verifies PoSQL proofs + mint logic |
+| SemaphoreCicada  | Smart Contract | `0.0.985433` | Anonymous peg voting               |
+| DynamicPegToken  | HTS Token      | `0.0.985434` | Consortium stablecoin              |
+| AuditTopic       | HCS Topic      | `0.0.985435` | Logs mint proofs + votes           |
+| Operator Account | Account        | `0.0.123456` | Deployer/Test Operator             |
+
+## Deployment & Setup Instructions
+
+1. **Clone the Repository**
+
+```bash
+git clone https://github.com/adapole/rise-h.git
+cd rise-h
+```
+
+2. **Install Dependencies**
 
 ```bash
 yarn
 ```
-
-## 📜 Usage
-
-### Local server
 
 You can start your app locally with:
 
@@ -20,22 +184,75 @@ You can start your app locally with:
 yarn dev
 ```
 
-### Deploy the contract
+3. **Configure Environment Variables**
 
-1. Go to the `apps/contracts` directory and deploy your contract:
+Create `.env` file
 
-```bash
-yarn deploy --semaphore <semaphore-address> --network sepolia
+```env
+HEDERA_OPERATOR_ID=0.0.123456
+HEDERA_OPERATOR_KEY=302e020100300506032b657004220420...
+SPACE_TIME_API_KEY=your_space_time_api_key
+SPACE_TIME_ENDPOINT=https://api.spaceandtime.dev
+TOKEN_ID=0.0.985434
+MINT_CONTROLLER_ID=0.0.985432
 ```
 
-2. Update your `apps/web-app/.env.production` file with your new contract address and the group id.
+> Judges: Test credentials (Operator ID & Private Key) are provided in the **DoraHacks submission note field securely**.
 
-3. Copy your contract artifacts from `apps/contracts/artifacts/contracts/` folder to `apps/web-app/contract-artifacts` folder manually.
+4. **Compile and Deploy Contracts**
+    1. Go to the `apps/contracts` directory and deploy your contract:
 
-> [!NOTE]
-> Check the Semaphore contract addresses [here](https://docs.semaphore.pse.dev/deployed-contracts).
+    ```bash
+    yarn compile
+    yarn run tasks/deploy.ts --network hedera-testnet
+    ```
 
-### Code quality and formatting
+    ```bash
+    yarn deploy --semaphore <semaphore-address> --network hedera-testnet
+    ```
+
+    2. Update your `apps/web-app/.env.production` file with your new contract address and the group id.
+
+    3. Copy your contract artifacts from `apps/contracts/artifacts/contracts/` folder to `apps/web-app/contract-artifacts` folder manually.
+
+    > [!NOTE]
+    > Check the Semaphore contract addresses [here](https://docs.semaphore.pse.dev/deployed-contracts).
+
+### 📜 Usage
+
+5. **Submit a PoSQL Proof (Simulated)**
+
+```bash
+npx ts-node scripts/mintWithProof.ts
+```
+
+Example SQL used in PoSQL proof:
+
+```sql
+SELECT SUM(reserve_usd)
+FROM bank_reserves
+WHERE timestamp > '2025-01-01T00:00:00Z';
+```
+
+6. **Verify Proof and Mint Token**
+
+Once verified, the MintController calls the HTS precompile to mint:
+
+```ts
+await mintController.mintWithProof({
+    proof: proofBytes,
+    amount: 1000000
+})
+```
+
+7. **Run Frontend & Backend**
+
+| Component | Command               | URL                                            |
+| --------- | --------------------- | ---------------------------------------------- |
+| Backend   | `yarn run dev:server` | [http://localhost:8000](http://localhost:8000) |
+| Frontend  | `yarn run dev:web`    | [http://localhost:3000](http://localhost:3000) |
+
+8. **Code quality and formatting**
 
 Run [ESLint](https://eslint.org/) and [solhint](https://github.com/protofire/solhint) to analyze the code and catch bugs:
 
@@ -54,3 +271,75 @@ Or to automatically format the code:
 ```bash
 yarn prettier:write
 ```
+
+### Transaction Lifecycle
+
+| Step | Action                 | Hedera Service | Fee (USD) | Duration |
+| ---- | ---------------------- | -------------- | --------- | -------- |
+| 1    | Submit SQL Proof       | HSCS           | <$0.05    | ~3s      |
+| 2    | Log Proof Hash         | HCS            | $0.0001   | ~1s      |
+| 3    | Mint Stablecoin        | HTS            | $0.001    | ~2s      |
+| ---- | ---------------------- | -------------- | --------- | -------- |
+| 4    | Peg Vote via Semaphore | HSCS           | $0.03     | ~4s      |
+| 5    | Record Final Tally     | HCS            | $0.0001   | ~1s      |
+
+### 📋 Developer Checklist — Integrating PoSQL on Hedera
+
+1. **Provision a Space & Time Account**
+
+- Obtain credentials and test access to your SQL endpoint.
+
+- Mirror your reserve schema (balances, timestamps, ledgers).
+
+2. **Generate and Verify Proofs**
+
+```sql
+SELECT SUM(reserve_usd)
+FROM bank_reserves
+WHERE timestamp >= '2025-01-01T00:00:00Z';
+```
+
+Produce the **verifiable proof blob** from PoSQL CLI or SDK.
+
+3. **Deploy Verifier + MintController**
+
+- Deploy `IPoSQLVerifier` on Hedera.
+
+- Deploy `MintController` and set verifier + token address.
+
+4. **Submit Mint Requests**
+
+```ts
+await mintController.mintWithProof({
+    query: "SELECT SUM(reserve_usd) ...",
+    proof: proofBytes,
+    amount: ethers.parseUnits("1000", 6)
+})
+```
+
+5. **Vote on Peg Updates**
+
+- Consortium members use **Semaphore** group membership.
+
+- Votes validated via `validateProof()`, results delayed by timelock.
+
+## 🧠 Governance & Privacy
+
+- **Temporary tally privacy**: Time-lock puzzles hide results until expiry.
+
+- **Permanent ballot privacy**: Each vote hashed & verified with zk-set membership.
+
+- **Eligibility enforcement**: Semaphore group memberships issued by consortium.
+
+# 🧩 Part II — Decentralized Netting Protocol (Coming Soon)
+
+The next phase introduces **multilateral netting** between banks, allowing many-to-many settlement reduction.
+This module will use:
+
+- Zero-knowledge proofs of solvency
+
+- Homomorphic encryption for exposure matching
+
+- Time-locked settlement DAG on Hedera
+
+Stay tuned for v0.2 of the protocol.

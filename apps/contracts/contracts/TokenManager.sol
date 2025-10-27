@@ -16,7 +16,9 @@ interface HederaTokenService {
 }
 
 contract TokenManager {
-    HederaTokenService constant hts = HederaTokenService(0x167);
+    // Hedera Token Service precompile address (0x167) converted safely:
+    // convert the integer to uint160, then to address, then to the contract type
+    HederaTokenService constant hts = HederaTokenService(address(uint160(0x167)));
     address public token;
 
     constructor(address treasury) {

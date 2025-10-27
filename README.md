@@ -343,3 +343,8 @@ This module will use:
 - Time-locked settlement DAG on Hedera
 
 Stay tuned for v0.2 of the protocol.
+
+
+
+# License
+Rise is licensed under the Business Source License 1.1 (BUSL-1.1), see [LICENSE](/LICENSE) 

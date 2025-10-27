@@ -10,8 +10,12 @@ dotenvConfig({ path: resolve(__dirname, "../../.env") })
 
 const config: HardhatUserConfig = {
     solidity: "0.8.23",
-    defaultNetwork: process.env.DEFAULT_NETWORK || "hardhat",
+    defaultNetwork: process.env.DEFAULT_NETWORK || "testnet",
     networks: {
+        testnet: {
+            url: process.env.HEDERA_RPC_URL, // e.g. "https://testnet.hashio.io/api"
+            accounts: [process.env.HEDERA_PRIVATE_KEY]
+        },
         hardhat: {
             chainId: 1337
         },

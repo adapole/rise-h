@@ -1,40 +1,26 @@
-import "@nomicfoundation/hardhat-toolbox"
-import "@semaphore-protocol/hardhat"
-import { getHardhatNetworks } from "@semaphore-protocol/utils"
-import { config as dotenvConfig } from "dotenv"
-import { HardhatUserConfig } from "hardhat/config"
-import { resolve } from "path"
-import "./tasks/deploy"
-
-dotenvConfig({ path: resolve(__dirname, "../../.env") })
+import type { HardhatUserConfig } from "hardhat/config"
+import hardhatToolboxMochaEthersPlugin from "@nomicfoundation/hardhat-toolbox-mocha-ethers"
+import { configVariable } from "hardhat/config"
 
 const config: HardhatUserConfig = {
-    solidity: "0.8.23",
-    defaultNetwork: process.env.DEFAULT_NETWORK || "testnet",
+    plugins: [hardhatToolboxMochaEthersPlugin],
+    solidity: {
+        profiles: {
+            default: { version: "0.8.28" },
+            production: {
+                version: "0.8.28",
+                settings: { optimizer: { enabled: true, runs: 200 } }
+            }
+        }
+    },
     networks: {
         testnet: {
-            url: process.env.HEDERA_RPC_URL, // e.g. "https://testnet.hashio.io/api"
-            accounts: [process.env.HEDERA_PRIVATE_KEY]
-        },
-        hardhat: {
-            chainId: 1337
-        },
-        ...getHardhatNetworks(process.env.ETHEREUM_PRIVATE_KEY)
+            type: "http",
+            url: configVariable("HEDERA_RPC_URL"),
+            accounts: [configVariable("HEDERA_PRIVATE_KEY")]
+        }
     },
-    gasReporter: {
-        currency: "USD",
-        enabled: process.env.REPORT_GAS === "true",
-        coinmarketcap: process.env.COINMARKETCAP_API_KEY
-    },
-    typechain: {
-        target: "ethers-v6"
-    },
-    etherscan: {
-        apiKey: process.env.ETHERSCAN_API_KEY
-    },
-    sourcify: {
-        enabled: true
-    }
+    defaultNetwork: process.env.DEFAULT_NETWORK || "testnet"
 }
 
 export default config

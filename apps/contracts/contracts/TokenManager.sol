@@ -16,24 +16,7 @@ import {KeyHelper} from "@hashgraph/smart-contracts/contracts/system-contracts/h
 import {ExpiryHelper} from "@hashgraph/smart-contracts/contracts/system-contracts/hedera-token-service/ExpiryHelper.sol";
 
 
-// interface HederaTokenService {
-//     function createFungibleToken(
-//         address treasury,
-//         uint64 initialSupply,
-//         string memory tokenName,
-//         string memory tokenSymbol,
-//         uint32 decimals
-//     ) external returns (address tokenAddress);
-
-//     function mintToken(address token, int64 amount, bytes[] calldata metadata) external returns (int64 newTotalSupply);
-
-//     function burnToken(address token, int64 amount, bytes[] calldata metadata) external returns (int64 newTotalSupply);
-// }
-
 contract TokenManager is HederaTokenService, ExpiryHelper, KeyHelper {
-    // Hedera Token Service precompile address (0x167) converted safely:
-    // convert the integer to uint160, then to address, then to the contract type
-    // HederaTokenService constant hts = HederaTokenService(address(uint160(0x167)));
     address public tokenAddress;
 
     // Cosmetic copies for convenience (optional)
@@ -54,6 +37,9 @@ contract TokenManager is HederaTokenService, ExpiryHelper, KeyHelper {
     event KycGranted(bool kycGranted);
     event ResponseCode(int responseCode);
     event IsAssociated(bool status);
+    event HBARReceived(address indexed from, uint256 amount);
+    event HBARFallback(address sender, uint256 amount, bytes data);
+    event HBARWithdrawn(address indexed to, uint256 amount);
 
     error CryptoTransferFailed();
     error CreateFungibleTokenFailed();
@@ -66,37 +52,66 @@ contract TokenManager is HederaTokenService, ExpiryHelper, KeyHelper {
     error ApproveFailed();
     error UpdateTokenExpiryInfoFailed();
 
-    constructor(address treasury) {
-        IHederaTokenService.TokenKey[] memory keys = new IHederaTokenService.TokenKey[](6);
-        keys[0] = getSingleKey(KeyType.ADMIN, KeyType.PAUSE, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
-        keys[1] = getSingleKey(KeyType.KYC, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
-        keys[2] = getSingleKey(KeyType.FREEZE, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
-        keys[3] = getSingleKey(KeyType.WIPE, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
-        keys[4] = getSingleKey(KeyType.SUPPLY, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
-        keys[5] = getSingleKey(KeyType.FEE, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
+    constructor() {
+        // IHederaTokenService.TokenKey[] memory keys = new IHederaTokenService.TokenKey[](6);
+        //     keys[0] = getSingleKey(KeyType.ADMIN, KeyType.PAUSE, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
+        //     keys[1] = getSingleKey(KeyType.KYC, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
+        //     keys[2] = getSingleKey(KeyType.FREEZE, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
+        //     keys[3] = getSingleKey(KeyType.WIPE, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
+        //     keys[4] = getSingleKey(KeyType.SUPPLY, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
+        //     keys[5] = getSingleKey(KeyType.FEE, KeyValueType.INHERIT_ACCOUNT_KEY, bytes(""));
 
-        IHederaTokenService.Expiry memory expiry = IHederaTokenService.Expiry(
-            0, treasury, 8000000
-        );
+        //     IHederaTokenService.Expiry memory expiry = IHederaTokenService.Expiry(
+        //         0, treasury, 8000000
+        //     );
 
-        IHederaTokenService.HederaToken memory token = IHederaTokenService.HederaToken(
-            name, symbol, treasury, memo, finiteTotalSupplyType, maxSupply, freezeDefaultStatus, keys, expiry
+        //     IHederaTokenService.HederaToken memory token = IHederaTokenService.HederaToken(
+        //         name, symbol, treasury, memo, finiteTotalSupplyType, maxSupply, freezeDefaultStatus, keys, expiry
+        //     );
+            
+            
+        //     (int responseCode, address _tokenAddress) = HederaTokenService.createFungibleToken(token, initialTotalSupply, decimals);
+        //     if (responseCode != HederaResponseCodes.SUCCESS) {
+        //         revert CreateFungibleTokenFailed();
+        //     }
+        //     tokenAddress = _tokenAddress;
+
+        //     emit CreatedToken(tokenAddress);
+    }
+
+    function createToken() external payable {
+        IHederaTokenService.HederaToken memory token;
+        token.name = name;
+        token.symbol = symbol;
+        token.treasury = address(this);
+        token.memo = "";
+
+        // Keys: SUPPLY + ADMIN -> contractId
+        IHederaTokenService.TokenKey[]
+            memory keys = new IHederaTokenService.TokenKey[](2);
+        keys[0] = getSingleKey(
+            KeyType.SUPPLY,
+            KeyValueType.CONTRACT_ID,
+            address(this)
         );
-        
-        
-        (int responseCode, address _tokenAddress) = HederaTokenService.createFungibleToken(token, initialTotalSupply, decimals);
+        keys[1] = getSingleKey(
+            KeyType.ADMIN,
+            KeyValueType.CONTRACT_ID,
+            address(this)
+        );
+        token.tokenKeys = keys;
+
+        (int responseCode, address _tokenAddress) = createFungibleToken(token, initialTotalSupply, decimals);
         if (responseCode != HederaResponseCodes.SUCCESS) {
             revert CreateFungibleTokenFailed();
         }
         tokenAddress = _tokenAddress;
-
         emit CreatedToken(tokenAddress);
     }
 
-
     function mintTokenPublic(address token, int64 amount, bytes[] memory metadata) public
     returns (int responseCode, int64 newTotalSupply, int64[] memory serialNumbers)  {
-        (responseCode, newTotalSupply, serialNumbers) = HederaTokenService.mintToken(token, amount, metadata);
+        (responseCode, newTotalSupply, serialNumbers) = mintToken(token, amount, metadata);
         emit ResponseCode(responseCode);
 
         if (responseCode != HederaResponseCodes.SUCCESS) {
@@ -106,15 +121,44 @@ contract TokenManager is HederaTokenService, ExpiryHelper, KeyHelper {
         emit MintedToken(newTotalSupply, serialNumbers);
     }
 
-    function mintTokenToAddressPublic(address token, address receiver, int64 amount, bytes[] memory metadata) public
+    function mintTokenToAddressPublic(address receiver, int64 amount) public
     returns (int responseCode, int64 newTotalSupply, int64[] memory serialNumbers)  {
-        (responseCode, newTotalSupply, serialNumbers) = mintTokenPublic(token, amount, metadata);
+        address token = tokenAddress;
+        bytes[] memory arr = new bytes[](0);
+        (responseCode, newTotalSupply, serialNumbers) = mintTokenPublic(token, amount, arr);
 
-        // (int success) = 
-        HederaTokenService.transferToken(token, address(this), receiver, amount);
-        // if (success != HederaResponseCodes.SUCCESS) revert CryptoTransferFailed();
+        (int success) = transferToken(token, address(this), receiver, amount);
+        if (success != HederaResponseCodes.SUCCESS) revert CryptoTransferFailed();
         
         emit TransferToken(token, receiver, amount);
+    }
+
+    function _mintAndSend(
+        address to,
+        int64 amount
+    ) internal returns (uint256 tokenId) {
+        require(tokenAddress != address(0), "HTS: not created");
+
+        // 1) Mint to treasury (this contract)
+        bytes[] memory arr = new bytes[](0);
+        (int rc, int64 newTotalSupply, int64[] memory _serials) = mintToken(
+            tokenAddress,
+            amount,
+            arr
+        );
+        require(
+            rc == HederaResponseCodes.SUCCESS,
+            "HTS: mint failed"
+        );
+
+        // 2) Transfer from treasury -> recipient via ERC20 facade
+        // Recipient must be associated (or have auto-association available)
+        IERC20(tokenAddress).transferFrom(address(this), to, uint256(uint64(amount)));
+
+        emit MintedToken(newTotalSupply, _serials);
+        
+        uint256 serial = uint256(uint64(_serials[0]));
+        return serial;
     }
 
     // Mint additional tokens. Ensure that msg.sender holds the supply key or is authorized.
@@ -175,5 +219,26 @@ contract TokenManager is HederaTokenService, ExpiryHelper, KeyHelper {
     function isAssociated(address token) public {
         bool status = IHRC719(token).isAssociated();
         emit IsAssociated(status);
+    }
+
+    // ---------------------------------------------------------------------------
+    // HBAR handling
+    // ---------------------------------------------------------------------------
+
+    // Accept HBAR
+    receive() external payable {
+        emit HBARReceived(msg.sender, msg.value);
+    }
+
+    fallback() external payable {
+        emit HBARFallback(msg.sender, msg.value, msg.data);
+    }
+
+    function withdrawHBAR() external {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No HBAR to withdraw");
+        (bool success, ) = msg.sender.call{value: balance}("");
+        require(success, "Failed to withdraw HBAR");
+        emit HBARWithdrawn(msg.sender, balance);
     }
 }

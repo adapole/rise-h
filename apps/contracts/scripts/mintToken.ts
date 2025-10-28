@@ -1,6 +1,10 @@
 import { network } from "hardhat"
-import * as dotenv from "dotenv"
-dotenv.config()
+import { config as dotenvConfig } from "dotenv"
+import { fileURLToPath } from "url"
+import { dirname, resolve } from "path"
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+dotenvConfig({ path: resolve(__dirname, "../../../.env") })
 
 const { ethers } = await network.connect({ network: "testnet" })
 
@@ -8,7 +12,7 @@ async function main() {
     const [signer] = await ethers.getSigners()
     console.log("Using signer:", signer.address)
 
-    const contractAddress = (process.env.TOKENMANAGER_ADDRESS as string) || "0xEF1b00B0EE9E60926A521B1896b10A5966d4a918"
+    const contractAddress = process.env.TOKENMANAGER_ADDRESS as string
     const recipient = signer.address
 
     const myHTSTokenContract = await ethers.getContractAt("TokenManager", contractAddress, signer)

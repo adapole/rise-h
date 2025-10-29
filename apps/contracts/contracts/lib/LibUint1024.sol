@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8;
+pragma solidity >=0.8.23 <0.9.0;
 
 
 /// @dev A library for big (1024-bit) number arithmetic, including modular arithmetic

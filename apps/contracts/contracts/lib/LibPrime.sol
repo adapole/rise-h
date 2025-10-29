@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8;
+pragma solidity >=0.8.23 <0.9.0;
 
 
 /// @dev A library implementing various probabilistic primality tests, plus 

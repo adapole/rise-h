@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8;
+pragma solidity >=0.8.23 <0.9.0;
 
-import './LibUint1024.sol';
-import './LibPrime.sol';
+import '../lib/LibUint1024.sol';
+import '../lib/LibPrime.sol';
 
 
 /// @dev The Cicada base contract. Note that the `createVote` and 

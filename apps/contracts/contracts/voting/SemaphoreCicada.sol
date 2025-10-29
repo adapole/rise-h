@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSL-1.0
-pragma solidity ^0.8;
+pragma solidity >=0.8.23 <0.9.0;
 
 import './CicadaVote.sol';
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";

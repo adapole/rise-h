@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSL-1.0
-pragma solidity ^0.8.20;
+pragma solidity >=0.8.23 <0.9.0;
 
 interface IHederaTokenService {
     function mintToken(address token, uint64 amount, bytes[] calldata metadata)

@@ -234,76 +234,48 @@ abstract contract CicadaVote {
         internal
         view
     {
+        // Step 1: Normalize proof arrays
         PoV.a_0 = PoV.a_0.normalize(pp.N);
         PoV.b_0 = PoV.b_0.normalize(pp.N);
         PoV.a_1 = PoV.a_1.normalize(pp.N);
         PoV.b_1 = PoV.b_1.normalize(pp.N);
 
-        // Fiat-Shamir
-        uint256 c = uint256(keccak256(abi.encode(
-            PoV.a_0,
-            PoV.b_0,
-            PoV.a_1,
-            PoV.b_1,
-            parametersHash
-        )));
+        // Step 2: Fiat-Shamir challenge
+        uint256 c = uint256(
+            keccak256(abi.encode(PoV.a_0, PoV.b_0, PoV.a_1, PoV.b_1, parametersHash))
+        );
 
-        // c_0 + c_1 = c (mod 2^256)
         unchecked {
-            if (PoV.c_0 + PoV.c_1 != c) {
-                revert InvalidBallot();
-            }
+            if (PoV.c_0 + PoV.c_1 != c) revert InvalidBallot();
         }
 
-        // g^t_0 = a_0 * u^c_0 (mod N)
-        uint256[4] memory lhs = pp.g
-            .expMod(PoV.t_0, pp.N)
-            .normalize(pp.N);
-        uint256[4] memory rhs = Z.u
-            .expMod(PoV.c_0, pp.N)
-            .mulMod(PoV.a_0, pp.N)
-            .normalize(pp.N);
-        if (!lhs.eq(rhs)) {
-            revert InvalidBallot();
-        }
+        // Step 3: Check g^t_0 = a_0 * u^c_0 (mod N)
+        uint256[4] memory lhs = pp.g.expMod(PoV.t_0, pp.N).normalize(pp.N);
+        uint256[4] memory uPowC0 = Z.u.expMod(PoV.c_0, pp.N);
+        uint256[4] memory rhs = uPowC0.mulMod(PoV.a_0, pp.N).normalize(pp.N);
+        if (!lhs.eq(rhs)) revert InvalidBallot();
 
-        // h^t_0 = b_0 * v^c_0 (mod N)
-        lhs = pp.h
-            .expMod(PoV.t_0, pp.N)
-            .normalize(pp.N);
-        rhs = Z.v
-            .expMod(PoV.c_0, pp.N)
-            .mulMod(PoV.b_0, pp.N)
-            .normalize(pp.N);
-        if (!lhs.eq(rhs)) {
-            revert InvalidBallot();
-        }
+        // Step 4: Check h^t_0 = b_0 * v^c_0 (mod N)
+        lhs = pp.h.expMod(PoV.t_0, pp.N).normalize(pp.N);
+        uint256[4] memory vPowC0 = Z.v.expMod(PoV.c_0, pp.N);
+        rhs = vPowC0.mulMod(PoV.b_0, pp.N).normalize(pp.N);
+        if (!lhs.eq(rhs)) revert InvalidBallot();
 
-        // g^t_1 = a_1 * u^c_1 (mod N)
-        lhs = pp.g
-            .expMod(PoV.t_1, pp.N)
-            .normalize(pp.N);
-        rhs = Z.u
-            .expMod(PoV.c_1, pp.N)
-            .mulMod(PoV.a_1, pp.N)
-            .normalize(pp.N);
-        if (!lhs.eq(rhs)) {
-            revert InvalidBallot();
-        }
+        // Step 5: Check g^t_1 = a_1 * u^c_1 (mod N)
+        lhs = pp.g.expMod(PoV.t_1, pp.N).normalize(pp.N);
+        uint256[4] memory uPowC1 = Z.u.expMod(PoV.c_1, pp.N);
+        rhs = uPowC1.mulMod(PoV.a_1, pp.N).normalize(pp.N);
+        if (!lhs.eq(rhs)) revert InvalidBallot();
 
-        // h^t_1 = b_1 * (v * y^(-1))^c_1 (mod N)
-        lhs = pp.h
-            .expMod(PoV.t_1, pp.N)
-            .normalize(pp.N);
-        rhs = Z.v
-            .mulMod(pp.yInv, pp.N)
-            .expMod(PoV.c_1, pp.N)
-            .mulMod(PoV.b_1, pp.N)
-            .normalize(pp.N);
-        if (!lhs.eq(rhs)) {
-            revert InvalidBallot();
-        }
-    }
+        // Step 6: Check h^t_1 = b_1 * (v * yInv)^c_1 (mod N)
+        lhs = pp.h.expMod(PoV.t_1, pp.N).normalize(pp.N);
+        uint256[4] memory vTimesYInv = Z.v.mulMod(pp.yInv, pp.N);
+        uint256[4] memory vTimesYInvPowC1 = vTimesYInv.expMod(PoV.c_1, pp.N);
+        uint256[4] memory rhsTmp = vTimesYInvPowC1.mulMod(PoV.b_1, pp.N);
+        rhs = rhsTmp.normalize(pp.N);
+        if (!lhs.eq(rhs)) revert InvalidBallot();
+}
+
 
     /// @dev Verifies that `s` is the plaintext tally encoded in the 
     ///      homomorphic timelock puzzle `Z`. 
@@ -324,13 +296,19 @@ abstract contract CicadaVote {
         view
     {
         bytes32 parametersHash = keccak256(abi.encode(pp));
+
+        // Verify Wesolowski exponentiation proof
         _verifyExponentiation(pp, parametersHash, Z.u, w, PoE);
 
-        // Check v = w * y^s (mod N)
-        uint256[4] memory rhs = pp.y
-            .expMod(s, pp.N)
-            .mulMod(w, pp.N)
-            .normalize(pp.N);
+        // Compute y^s (mod N) separately
+        uint256[4] memory yPowS = pp.y.expMod(s, pp.N);
+
+        // Multiply by w
+        uint256[4] memory rhsTmp = yPowS.mulMod(w, pp.N);
+
+        // Normalize result
+        uint256[4] memory rhs = rhsTmp.normalize(pp.N);
+
         if (!Z.v.eq(rhs)) {
             revert InvalidPuzzleSolution();
         }
@@ -373,8 +351,13 @@ abstract contract CicadaVote {
     )
         private
     {
-        tally.u = tally.u.mulMod(ballot.u, pp.N).normalize(pp.N);
-        tally.v = tally.v.mulMod(ballot.v, pp.N).normalize(pp.N);
+        // u component
+        uint256[4] memory newU = tally.u.mulMod(ballot.u, pp.N);
+        tally.u = newU.normalize(pp.N);
+
+        // v component
+        uint256[4] memory newV = tally.v.mulMod(ballot.v, pp.N);
+        tally.v = newV.normalize(pp.N);
     }
 
     // Computes (base ** exponent) % modulus

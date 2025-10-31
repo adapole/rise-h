@@ -1,0 +1,603 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.logo {
+  color: #2A9D8F;
+  font-size: 24px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav a {
+  color: #4B5563;
+  text-decoration: none;
+}
+
+.main {
+  min-height: 100vh;
+}
+
+.hero {
+  display: flex;
+  gap: 37px;
+  padding: 64px 32px;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 650px;
+  padding-top: 131.5px;
+}
+
+.heroContent h1 {
+  color: #1F2937;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 48px;
+  margin: 0;
+}
+
+.heroContent p {
+  color: #4B5563;
+  font-size: 20px;
+  line-height: 28px;
+  margin: 0;
+}
+
+.heroImage {
+  box-shadow: 0px 4px 6px -4px rgba(0, 0, 0, 0.10), 0px 10px 15px -3px rgba(0, 0, 0, 0.10);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.heroImage img {
+  object-fit: cover;
+}
+
+.steps {
+  background: #F9FAFB;
+  padding: 48px 0;
+  text-align: center;
+}
+
+.steps h2 {
+  color: #000000;
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0 0 40px;
+}
+
+.stepsProgress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.stepNumber {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #D1D5DB;
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepNumber.active {
+  background: #2A9D8F;
+}
+
+.stepLine {
+  width: 128px;
+  height: 4px;
+  background: #D1D5DB;
+}
+
+.stepLine.active {
+  background: #2A9D8F;
+}
+
+.stepLabels {
+  display: flex;
+  justify-content: center;
+  gap: 127px;
+  color: #000000;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 56px;
+}
+
+.formContainer {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.formCard {
+  background: #FFFFFF;
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0px 2px 4px -2px rgba(0, 0, 0, 0.10), 0px 4px 6px -1px rgba(0, 0, 0, 0.10);
+}
+
+.formCard h3 {
+  color: #000000;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 24px;
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.formGroup label {
+  display: block;
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: #9CA3AF;
+}
+
+.locationInput {
+  display: flex;
+  gap: 16px;
+}
+
+.locationInput input {
+  flex-grow: 1;
+}
+
+.mapButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #F3F4F6;
+  border: none;
+  border-radius: 6px;
+  color: #4B5563;
+  cursor: pointer;
+}
+
+.mapPreview {
+  margin-top: 8px;
+  height: 192px;
+  background: #F3F4F6;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6B7280;
+}
+
+.formRow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.formRow .formGroup {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 30px;
+}
+
+.primaryButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #2A9D8F;
+  border: none;
+  border-radius: 6px;
+  color: #FFFFFF;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.outlineButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: transparent;
+  border: 2px solid #FFFFFF;
+  border-radius: 6px;
+  color: #FFFFFF;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.benefits {
+  padding: 64px 32px;
+  text-align: center;
+}
+
+.benefits h2 {
+  color: #000000;
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0 0 48px;
+}
+
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.benefitCard {
+  background: #FFFFFF;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0px 2px 4px -2px rgba(0, 0, 0, 0.10), 0px 4px 6px -1px rgba(0, 0, 0, 0.10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.benefitIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(42, 157, 143, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.benefitCard h3 {
+  color: #000000;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.benefitCard p {
+  color: #4B5563;
+  margin: 0;
+  text-align: center;
+}
+
+.faq {
+  background: #F9FAFB;
+  padding: 48px 32px;
+}
+
+.faq h2 {
+  color: #000000;
+  font-size: 30px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 32px;
+}
+
+.faqList {
+  max-width: 768px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faqItem {
+  background: #FFFFFF;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.faqItem h3 {
+  color: #000000;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.faqItem p {
+  color: #4B5563;
+  margin: 0;
+}
+
+.cta {
+  background: #712F79;
+  color: #FFFFFF;
+  padding: 64px 32px;
+  text-align: center;
+}
+
+.cta h2 {
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.cta p {
+  font-size: 18px;
+  margin: 0 0 32px;
+}
+
+.ctaButtons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.footer {
+  background: #F3F4F6;
+  padding: 48px 0;
+}
+
+.footerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.footerColumn h3 {
+  color: #000000;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.footerColumn a {
+  display: block;
+  color: #4B5563;
+  text-decoration: none;
+  margin-bottom: 8px;
+}
+
+.footerBottom {
+  border-top: 1px solid #D1D5DB;
+  padding-top: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footerCopyright {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #4B5563;
+}
+
+.footerDivider {
+  width: 5px;
+  height: 24px;
+  background: #4B5563;
+}
+
+.footerSocial {
+  display: flex;
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .hero {
+    flex-direction: column;
+    padding: 32px;
+  }
+
+  .heroContent {
+    padding-top: 0;
+    max-width: 100%;
+  }
+
+  .benefitsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .footerGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .stepLabels {
+    gap: 32px;
+  }
+
+  .footerBottom {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .heroContent h1 {
+    font-size: 36px;
+    line-height: 40px;
+  }
+
+  .heroContent p {
+    font-size: 18px;
+  }
+
+  .formRow {
+    flex-direction: column;
+  }
+
+  .footerGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Form styles for multi-step workflow */
+.imagePreview {
+  text-align: center;
+  padding: 20px;
+  border: 2px dashed #E5E7EB;
+  border-radius: 8px;
+}
+
+.imagePreview p {
+  margin-top: 10px;
+  color: #6B7280;
+  font-size: 14px;
+}
+
+.amenitiesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.amenityCard {
+  padding: 12px 16px;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+.amenityCard:hover {
+  border-color: #2A9D8F;
+}
+
+.amenityCard.selected {
+  border-color: #2A9D8F;
+  background: #F0FDFA;
+  color: #2A9D8F;
+  font-weight: 600;
+}
+
+.summary {
+  background: #F9FAFB;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+}
+
+.summary p {
+  margin: 8px 0;
+  color: #374151;
+}
+
+.connectWallet {
+  background: #FEF3C7;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #F59E0B;
+  margin-top: 20px;
+}
+
+.connectWallet p {
+  margin: 0;
+  color: #92400E;
+  font-weight: 500;
+}
+
+.error {
+  background: #FEE2E2;
+  color: #DC2626;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.successContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.successCard {
+  background: white;
+  padding: 48px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 500px;
+}
+
+.successCard h2 {
+  color: #059669;
+  margin: 0 0 24px 0;
+  font-size: 32px;
+}
+
+.nftDetails {
+  background: #F0F9FF;
+  padding: 24px;
+  border-radius: 8px;
+  margin: 24px 0;
+  text-align: left;
+}
+
+.nftDetails p {
+  margin: 8px 0;
+  font-family: monospace;
+  font-size: 14px;
+  word-break: break-all;
+}
+
+.successActions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.successActions .primaryButton,
+.successActions .outlineButton {
+  flex: 1;
+  max-width: 200px;
+} 

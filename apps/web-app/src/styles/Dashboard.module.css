@@ -1,0 +1,454 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.logo {
+  color: #2A9D8F;
+  font-size: 24px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav a {
+  color: #4B5563;
+  text-decoration: none;
+}
+
+.main {
+  min-height: 100vh;
+  background: #F9FAFB;
+}
+
+/* Connect Prompt Styles */
+.connectPrompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 32px;
+}
+
+.connectCard {
+  background: white;
+  padding: 48px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 500px;
+}
+
+.connectCard h1 {
+  color: #1F2937;
+  margin: 0 0 16px 0;
+  font-size: 32px;
+}
+
+.connectCard p {
+  color: #4B5563;
+  margin: 0 0 32px 0;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+/* Dashboard Container */
+.dashboardContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.dashboardHeader h1 {
+  color: #1F2937;
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.accountInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.accountInfo p {
+  color: #4B5563;
+  margin: 0;
+  font-size: 14px;
+  font-family: monospace;
+}
+
+.refreshButton {
+  padding: 8px 16px;
+  background: #F3F4F6;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  color: #4B5563;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.refreshButton:hover {
+  background: #E5E7EB;
+}
+
+.refreshButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error and Loading States */
+.error {
+  background: #FEE2E2;
+  color: #DC2626;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 1px solid #FECACA;
+}
+
+.loading {
+  text-align: center;
+  padding: 48px;
+  color: #6B7280;
+  font-size: 18px;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.emptyStateCard {
+  background: white;
+  padding: 48px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+}
+
+.emptyStateCard h2 {
+  color: #1F2937;
+  margin: 0 0 16px 0;
+  font-size: 28px;
+}
+
+.emptyStateCard p {
+  color: #6B7280;
+  margin: 0 0 32px 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.createButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #2A9D8F;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.createButton:hover {
+  background: #238B7B;
+}
+
+/* Properties Grid */
+.propertiesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.propertyCard {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.propertyCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.propertyImage {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.propertyType {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(42, 157, 143, 0.9);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.propertyContent {
+  padding: 20px;
+}
+
+.propertyContent h3 {
+  color: #1F2937;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.location {
+  color: #6B7280;
+  font-size: 14px;
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+
+.description {
+  color: #4B5563;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Property Details */
+.propertyDetails {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #F9FAFB;
+  border-radius: 8px;
+}
+
+.detailItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detailLabel {
+  color: #6B7280;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.detailItem span:last-child {
+  color: #1F2937;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Amenities */
+.amenities {
+  margin-bottom: 16px;
+}
+
+.amenitiesLabel {
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.amenitiesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.amenityTag {
+  background: #E0F2F1;
+  color: #2A9D8F;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* NFT Info */
+.nftInfo {
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #F0F9FF;
+  border-radius: 8px;
+  border: 1px solid #E0F2FE;
+}
+
+.nftDetail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.nftDetail:last-child {
+  margin-bottom: 0;
+}
+
+.nftLabel {
+  color: #0369A1;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nftValue {
+  color: #1E40AF;
+  font-size: 12px;
+  font-family: monospace;
+  font-weight: 500;
+}
+
+/* Property Actions */
+.propertyActions {
+  display: flex;
+  gap: 12px;
+}
+
+.viewButton {
+  flex: 1;
+  padding: 10px 16px;
+  background: #2A9D8F;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.viewButton:hover {
+  background: #238B7B;
+}
+
+.manageButton {
+  flex: 1;
+  padding: 10px 16px;
+  background: transparent;
+  color: #2A9D8F;
+  border: 2px solid #2A9D8F;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.manageButton:hover {
+  background: #2A9D8F;
+  color: white;
+}
+
+/* Dashboard Actions */
+.dashboardActions {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.addPropertyButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 32px;
+  background: #2A9D8F;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.addPropertyButton:hover {
+  background: #238B7B;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboardContainer {
+    padding: 16px;
+  }
+
+  .dashboardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .accountInfo {
+    align-items: flex-start;
+  }
+
+  .propertiesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .propertyDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .propertyActions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .nav {
+    gap: 16px;
+  }
+
+  .dashboardHeader h1 {
+    font-size: 28px;
+  }
+}

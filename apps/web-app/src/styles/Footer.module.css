@@ -1,0 +1,88 @@
+.footerModern {
+    margin-top: auto; /* ensures it sticks to the bottom */
+    background: linear-gradient(180deg, #0f0f10 0%, #111215 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 48px 24px 24px;
+    color: rgba(255, 255, 255, 0.75);
+    font-family: "Outfit", sans-serif;
+    text-align: center;
+    position: relative;
+}
+
+.footerModern::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+.footerInner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+.footerBrand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+}
+
+.footerNav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;
+}
+
+.footerNav a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 15px;
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.footerNav a:hover {
+    color: white;
+    transform: translateY(-1px);
+}
+
+.footerSocial {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.footerSocial a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.25s ease;
+}
+
+.footerSocial a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.footerBottomModern {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 32px;
+    color: rgba(255, 255, 255, 0.5);
+}

@@ -1,10 +1,69 @@
-# Rise — Decentralized Interbank Settlement Layer
+# Rise — Decentralized Interbank Settlement on Hedera
 
-**Track**: Onchain Finance & RWA
+**Project Title & Track**: Rise - Onchain Finance & RWA
 
-> ⚡ **“Rise redefines interbank finance by removing central banks as trusted intermediaries — just as Bitcoin cut out financial middlemen for individuals.”**
->
-> Instead of costly RTGS hubs and idle reserves, Rise enables **peer-to-peer interbank settlements** and **liquidity sharing**, powered by **Hedera DLT**, **Proof-of-SQL**, and **Zero-Knowledge verification**.
+PitchDeck [Link](https://www.canva.com/design/DAG3RjwGDbc/7XA_kDckQDdIteAgWOeq1w/edit?utm_content=DAG3RjwGDbc&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
+> ⚡ **“Rise redefines interbank finance by removing central banks as trusted intermediaries, like Bitcoin cut financial middlemen. It replaces costly RTGS hubs and idle reserves with a P2P settlement layer—private, resilient, energy-efficient—unlocking liquidity for trustless banking.”**
+
+## Problem Statement
+
+Ethiopia's EthSwitch monopoly (2.2B birr revenue FY24/25, up 34%) centralizes switches, imposing 1-2% fees, surveillance, and gridlocks on $2B remittances. Idle reserves lock 20-30% assets, excluding 60M unbanked amid 1929-like risks (rigid liquidity amplifies runs).
+
+## Hedera-Based Solution
+
+Rise's stablecoin consortium lets banks mint tokens via ZK-proven reserve reductions (Proof of SQL), transfer P2P, and net privately (coSNARKs). HTS tokenizes RWAs; HSCS executes netting; HCS logs proposals.
+
+## Hedera Integration Summary (Detailed)
+
+- **HTS**: Tokenizes stablecoin RWAs. Tx: TokenMintTransaction—banks prove reserves, mint pegged tokens ($0.0001 fee ensures MFIs' low margins). Justification: Predictable costs vs. EthSwitch volatility.
+- **HSCS**: Runs netting contracts (Algorithm 1). Tx: ContractExecuteTransaction—verifies coSNARK proofs for optimal settlements. ABFT finality (3s) beats delays.
+- **HCS**: Immutable logs for proposals. Tx: TopicMessageSubmitTransaction—$0.0001/tx for audits. ESG: Carbon-negative vs. PoW.
+- **Mirror Nodes**: Real-time txn queries for dashboard (e.g., mint hash).
+
+Detailed: Data flows from UI to API (shard inputs), MPC computes coSNARK, Hedera settles (HTS/HSCS/HCS), Mirror queries for verification.
+
+## Deployed Hedera Testnet IDs
+
+| Service               | ID          |
+| --------------------- | ----------- |
+| Stablecoin HTS Token  | 0.0.7152637 |
+| Voting HSCS Contract  | 0.0.7171630 |
+| Netting HSCS Contract | 0.0.7157557 |
+| Proposals HCS Topic   | 0.0.7145678 |
+
+## Prerequisites
+
+- Node.js v22.12.0+, Yarn 4.
+- Hedera testnet account (free via portal).
+- Space & Time API key for Proof of SQL (free tier for 100 queries).
+
+## Deployment & Setup Instructions
+
+1. Clone: `git clone https://github.com/adapole/rise-h && cd rise-h`.
+2. Install: `yarn install`.
+3. Config: Copy `.env.example` to `.env`; add Hedera account ID/private key (testnet only), Space & Time API key.
+4. Deploy Contracts: `yarn hardhat deploy --network hedera-testnet` (uses HTS/HSCS).
+5. Run Backend: `yarn backend:start` (Node.js on port 3001).
+6. Run Frontend: `yarn frontend:start` (React on localhost:3000).
+7. Test: Submit sample txn (e.g., mint stablecoin); view hash on Mirror Node Explorer.
+
+Expected: Frontend launches at localhost:3000; backend at 3001. First txn: HTS mint (hash query via Mirror).
+
+## Code Quality
+
+- Linted with ESLint/Prettier.
+- Comments on complex logic (e.g., coSNARK verification).
+- Commit history: Semantic (feat:, fix:).
+
+## Pitch Deck & Video
+
+- Deck: [Link to Google Slides/PDF].
+- Video: [YouTube/Vimeo link]—3-min demo with live HTS mint.
+
+## Security & Secrets
+
+No keys committed. Use `.env` for testnet only. Judge creds: Test account ID/private key in DoraHacks notes.
 
 ## 🧭 Overview
 
@@ -344,7 +403,6 @@ This module will use:
 
 Stay tuned for v0.2 of the protocol.
 
-
-
 # License
-Rise is licensed under the Business Source License 1.1 (BUSL-1.1), see [LICENSE](/LICENSE) 
+
+Rise is licensed under the Business Source License 1.1 (BUSL-1.1), see [LICENSE](/LICENSE)

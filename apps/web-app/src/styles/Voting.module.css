@@ -1,0 +1,27 @@
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.voteGrid {
+    display: grid;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.voteCard {
+    background: #f7f7f7;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.voteButtons button {
+    margin: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
